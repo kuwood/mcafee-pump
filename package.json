@@ -1,0 +1,28 @@
+{
+  "name": "mcafee-pump",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server/server.js",
+    "devstart": "nodemon server/server.js"
+  },
+  "dependencies": {
+    "body-parser": "~1.18.2",
+    "cookie-parser": "~1.4.3",
+    "cron": "^1.3.0",
+    "debug": "~2.6.9",
+    "dotenv": "^4.0.0",
+    "express": "~4.15.5",
+    "mongodb-backup": "^1.6.9",
+    "mongodb-restore": "^1.6.2",
+    "mongoose": "^4.13.7",
+    "morgan": "~1.9.0",
+    "redis": "^2.8.0",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2",
+    "serve-favicon": "~2.4.5"
+  },
+  "devDependencies": {
+    "nodemon": "^1.14.3"
+  }
+}
