@@ -28,7 +28,7 @@ function getCurrencyHourHistory(symbol, pairSym, exchange, tweetTime) {
     return rp(options);
 };
 
-function getCurrencyMinuteHistory(symbol, pairSym, exchange, tweetTime) {
+function getCurrencyMinuteHistory (symbol, pairSym, exchange, tweetTime) {
     const options = {
         method: 'GET',
         uri: 'https://min-api.cryptocompare.com/data/histominute',
@@ -44,29 +44,25 @@ function getCurrencyMinuteHistory(symbol, pairSym, exchange, tweetTime) {
     return rp(options);
 };
 
-async function getCurrencyProximity(name, symbol, pairSym, exchange, tweetTime) {
+async function getCurrencyProximity (name, symbol, pairSym, exchange, tweetTime) {
     const before = await getCurrencyMinuteHistory(symbol, pairSym, exchange, tweetTime - ONE_HOUR_IN_SECONDS);
-    // const after = await getCurrencyHourHistory(symbol, pairSym, exchange, tweetTime + ONE_HOUR_IN_SECONDS);
     const currencyProximity = {
         name,
         symbol,
         before: {
+            // FIX TO GRAB CORRECT TIME AND PRICE NOT ALWAYS [1]
            epoch: before.Data[1].time,
            price: before.Data[1].high 
         },
-        // after: {
-        //     epoch: after.Data[1].time,
-        //     price: after.Data[1].high 
-        // },
         pairing: pairSym
     }
 
     return currencyProximity;
 }
 
+module.exports = getCurrencyProximity;
 
 // rdd time 1514123803
-module.exports = getCurrencyProximity;
 // rdd tweet id 944929837671690241
 
 // (take index 1 in data array, and use high of the hour)
