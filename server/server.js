@@ -113,7 +113,8 @@ const updateAllPrices = new CronJob('*/10 * * * * *', function() {
   })
 }, null, true, 'America/Los_Angeles');
 // 947503819625201664
-const checkForCotw = new CronJob('0 */5 * * * *', function() {
+// /5
+const checkForCotw = new CronJob('0 * * * * *', function() {
   // get last lastCotCheckId from redis
   redisClient.get('lastCotCheckId', function(err, val) {
     // get mcafeetweetssince lastCotCheckId
@@ -121,7 +122,7 @@ const checkForCotw = new CronJob('0 */5 * * * *', function() {
     .then(tweets => {
       console.log(val)
       // update lastCotTweetId in redis
-      if (tweets.length < 0) {
+      if (tweets.length > 0) {
         redisClient.set('lastCotCheckId', tweets[0].id_str);
       }
       return tweets;
@@ -144,7 +145,7 @@ const checkForCotw = new CronJob('0 */5 * * * *', function() {
               .then(symbol => Coin.findOne({Symbol: symbol}))
               // use symbol to get coin proximity info and insert
               .then(async coin => {
-                const cp = await getCurrencyProximity(coin.Name, coin.Symbol, 'BTC', 'CCCAGG', (new Date(tweet.created_at).getTime() / 1000));
+                const cp = await getCurrencyProximity(coin.CoinName, coin.Symbol, 'BTC', 'CCCAGG', (new Date(tweet.created_at).getTime() / 1000));
                 const newCp = new CurrencyProximity(cp);
                 newCp.save(err => {
                   console.log('New currencyProximity: ' + newCp);
@@ -173,10 +174,26 @@ const checkForCotw = new CronJob('0 */5 * * * *', function() {
                   })
                   .then(tweet => {
                     const AddOneHour = (tweet.tweet_created_at.getTime() / 1000) + 3600;
-                    afterJob = new CronJob(new Date(AddOneHour), function() {
+                    afterJob = new CronJob(new Date(AddOneHour), async function() {
+                      const currentTime = new Date().getTime() / 1000;
+                      const options = {
+                        method: 'GET',
+                        uri: 'https://min-api.cryptocompare.com/data/',
+                        qs: {
+                          fsyms: coin.Symbol,
+                          tsyms: 'BTC'
+                        },
+                        json: true
+                      };
+                      // console.log(options)
+                      const priceInBtc = await rp(options).catch(e => console.log(e));
+                      const after = {
+                        "epoch": currentTime,
+                        "price": priceInBtc.BTC
+                      }
                       // find and update currencyproximity
-                      // call histominute for the after value, Or get current?
-                      CurrencyProximity.update({ _id: tweet.currency_proximity._id }, { $set: {after: after} })
+                      CurrencyProximity.update({ _id: tweet.currency_proximity._id }, { $set: {after: after} }).exec()
+                        .catch(e => console.log(e));
                       this.stop();
                     }, () => console.log('Finished hour later job'), true, 'America/Los_Angeles');
                   })
@@ -244,6 +261,7 @@ const checkForCotw = new CronJob('0 */5 * * * *', function() {
                       .catch(e => console.log(e));
                   })
                   .catch(e => console.log(e));
+
             })
             .catch(e => console.log(e));
           }    
@@ -254,10 +272,8 @@ const checkForCotw = new CronJob('0 */5 * * * *', function() {
 
   
 // TODO:
-// change price history lookup to minutes since it is within the 7 day data cutoff
-  //get previous price
-  //queue price update an hour after tweet
-
+  //FIX before price selection to use closest to original number 
+  // clean up and seperate the code
 }, null, true, 'America/Los_Angeles');
 
 
@@ -266,10 +282,5 @@ let afterJob;
   // cotw happen monday mornings
   // need to add a table view for all cotw/d
   // add support for ICO of the week
-
-// "SortOrder": "143",
-// "Id": "4547",
-// "Url": "/coins/kgc/overview",
-// "ImageUrl": "/media/19763/kgc.png",
 
 app.listen(process.env.PORT || 8080, () => console.log(`running on ${process.env.PORT || 8080}`));
