@@ -264,7 +264,7 @@ const checkForCotw = new CronJob('0 * * * * *', function() {
 
             })
             .catch(e => console.log(e));
-          }    
+          }
         }
       })
     })

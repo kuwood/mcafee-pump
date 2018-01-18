@@ -1,3 +1,15 @@
+require('dotenv').config();
+const mongoUrl = process.env.NODE_ENV === 'prod' ? process.env.MONGO_PROD : process.env.MONGO_MCPUMP;
+const mongoose = require('mongoose');
+mongoose.connect(mongoUrl, {
+  useMongoClient: true
+});
+mongoose.Promise = global.Promise;
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+
+const CurrencyProximity = require('../models/CurrencyProximity');
+const Tweet = require('../models/Tweet');
 
 // const getMcafeeTweets = require('./mcafeeTweets');
 // getMcafeeTweets
@@ -9,8 +21,8 @@
 //   })
 //   .catch(err => console.log(err));
 
-// const getCurrencyProximity = require('./getCurrencyProximity');
-// getCurrencyProximity('Electroneum', 'ETN', 'BTC', 'CCCAGG', new Date('Thu Dec 21 15:09:07 +0000 2017').getTime() / 1000)
+// const getCurrencyProximity = require('../services/getCurrencyProximity');
+// getCurrencyProximity('Dogecoin', 'DOGE', 'BTC', 'CCCAGG', new Date('Mon Jan 8 13:59:00 +0000 2017').getTime() / 1000)
 //   .then(cp => {
 //     const currencyProximity = new CurrencyProximity(cp);
 //     currencyProximity.save(err => {
@@ -19,9 +31,9 @@
 //   })
 //   .catch(error => console.log(error));
 
-// const getExactTweet = require('./getExactTweet');
+// const getExactTweet = require('../services/getExactTweet');
 // // get exact tweet
-// getExactTweet('944929837671690241')
+// getExactTweet('950366445401231360')
 //   .then(tweet => {
 //     tweet.tweet_created_at = tweet.created_at;
 //     tweet.tweet_id = tweet.id;
@@ -31,7 +43,7 @@
 //     delete tweet.id_str;
 //     // get coin proximity
 //     // add coin proximity to tweet
-//     return CurrencyProximity.findOne({symbol: 'RDD'})
+//     return CurrencyProximity.findOne({symbol: 'DOGE'})
 //       .then(cp => {
 //         tweet.currency_proximity = cp._id
 //         console.log(cp);
@@ -39,14 +51,15 @@
 //         console.log('cp._id', cp._id)
 //         return tweet
 //       })
+//       .then(completedTweet => {
+//         // insert tweet
+//         const newTweet = new Tweet(completedTweet);
+//         newTweet.save(err => {
+//             console.log('New Tweet: ' + newTweet.full_text);
+//         }).catch(e => console.log(e));
+//         return newTweet;
+//       })
 //       .catch(e => console.log(e));
-//   })
-//   .then(completedTweet => {
-//     // insert tweet
-//     const newTweet = new Tweet(completedTweet);
-//     newTweet.save(err => {
-//         console.log('New Tweet: ' + newTweet.full_text);
-//     }).catch(e => console.log(e));
 //   })
 //   .catch(error => console.log(error));
 
