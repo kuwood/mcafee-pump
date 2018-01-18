@@ -114,13 +114,13 @@ const updateAllPrices = new CronJob('*/10 * * * * *', function() {
 }, null, true, 'America/Los_Angeles');
 // 947503819625201664
 // /5
-const checkForCotw = new CronJob('0 * * * * *', function() {
+const checkForCotw = new CronJob('*/10 * * * * *', function() {
   // get last lastCotCheckId from redis
   redisClient.get('lastCotCheckId', function(err, val) {
     // get mcafeetweetssince lastCotCheckId
     getMcafeeTweetsSince(val)
     .then(tweets => {
-      console.log(val)
+      console.log('checking since', val);
       // update lastCotTweetId in redis
       if (tweets.length > 0) {
         redisClient.set('lastCotCheckId', tweets[0].id_str);
@@ -216,15 +216,15 @@ const checkForCotw = new CronJob('0 * * * * *', function() {
               .catch(e => console.log(e));
           } else {
             // use symbol to get coin proximity info and insert
-            Coin.findOne({Symbol: symbol})
+            Coin.findOne({Symbol: symbol.toUpperCase()})
               // use symbol to get coin proximity info and insert
               .then(async coin => {
-                const cp = await getCurrencyProximity(coin.Name, coin.Symbol, 'BTC', 'CCCAGG', new Date(tweet.tweet_created_at).getTime() / 1000);
+                const cp = await getCurrencyProximity(coin.CoinName, coin.Symbol, 'BTC', 'CCCAGG', new Date(tweet.created_at).getTime() / 1000);
                 const newCp = new CurrencyProximity(cp);
                 newCp.save(err => {
-                  console.log('New currencyProximity: ' + currencyProximity);
+                  console.log('New currencyProximity: ' + newCp);
                 }).catch(e => console.log(e));
-                //     tweet.tweet_created_at = tweet.created_at;
+                tweet.tweet_created_at = tweet.created_at;
                 tweet.tweet_id = tweet.id;
                 tweet.tweet_id_str = tweet.id_str;
                 delete tweet.created_at;
@@ -232,12 +232,12 @@ const checkForCotw = new CronJob('0 * * * * *', function() {
                 delete tweet.id_str;
                 // get coin proximity
                 // add coin proximity to tweet
-                CurrencyProximity.findOne({symbol: coin.symbol})
-                  .then(cp => {
-                    tweet.currency_proximity = cp._id
-                    console.log(cp);
+                CurrencyProximity.findOne({symbol: coin.Symbol})
+                  .then(cpToAdd => {
+                    tweet.currency_proximity = cpToAdd._id
+                    console.log(cpToAdd);
                     console.log('currency_proximity', tweet.currency_proximity)
-                    console.log('cp._id', cp._id)
+                    console.log('cpToAdd._id', cpToAdd._id)
                     return tweet
                   })
                   .then(completedTweet => {
@@ -272,7 +272,7 @@ const checkForCotw = new CronJob('0 * * * * *', function() {
 
   
 // TODO:
-  //FIX before price selection to use closest to original number 
+  // Need to add manual after data
   // clean up and seperate the code
 }, null, true, 'America/Los_Angeles');
 

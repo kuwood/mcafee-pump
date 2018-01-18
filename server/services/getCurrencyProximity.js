@@ -33,11 +33,11 @@ function getCurrencyMinuteHistory (symbol, pairSym, exchange, tweetTime) {
         method: 'GET',
         uri: 'https://min-api.cryptocompare.com/data/histominute',
         qs: {
-          limit: 2
+          limit: 1
         },
         json: true
       };
-    options.qs.toTs = tweetTime;
+    options.qs.toTs = '' + tweetTime;
     options.qs.fsym = symbol;
     options.qs.tsym = pairSym;
     options.qs.e = exchange;
