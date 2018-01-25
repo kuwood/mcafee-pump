@@ -2,6 +2,7 @@
   "name": "mcafee-pump",
   "version": "0.0.0",
   "private": true,
+  "engines" : { "node" : "~8.9.1" },
   "scripts": {
     "start": "node server/server.js",
     "devstart": "nodemon server/server.js"
