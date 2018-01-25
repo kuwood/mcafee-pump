@@ -77,13 +77,25 @@ Tweet.findOne()
   .sort('-tweet_created_at')
   .populate('currency_proximity')
   // .then(t => console.log('thing',t))
-  .then(tweet => redisClient.set('cot', JSON.stringify(tweet)))
+  .then(tweet => {
+    redisClient.set('cot', JSON.stringify(tweet));
+    return tweet;
+  })
+  .then(tweet => {
+    redisClient.get('lastCotCheckId', function(err, data) {
+      if (!data) {
+        redisClient.set('lastCotCheckId', tweet.tweet_id_str);
+      }
+    });
+  })
   .catch(e => console.log(e));
 
 CurrencyProximity.find({symbol: {$exists: true}})
   .then(data => data.map(cp => cp.symbol))
   .then(symbols => redisClient.set('allSymbols', JSON.stringify(symbols)))
-  .catch(e => console.log(e))
+  .catch(e => console.log(e));
+
+
 
 // Cron string format
 // Seconds: 0-59
@@ -95,6 +107,7 @@ CurrencyProximity.find({symbol: {$exists: true}})
 
 const updateAllPrices = new CronJob('*/10 * * * * *', function() {
   redisClient.get('allSymbols', function (err, data) {
+    if (err) console.log(err);
     const symbols = JSON.parse(data).join(',');
     const options = {
       method: 'GET',
@@ -112,15 +125,15 @@ const updateAllPrices = new CronJob('*/10 * * * * *', function() {
       .catch(e => console.log(e));
   })
 }, null, true, 'America/Los_Angeles');
-// 947503819625201664
-// /5
+
+
 const checkForCotw = new CronJob('0 * * * * *', function() {
   // get last lastCotCheckId from redis
   redisClient.get('lastCotCheckId', function(err, val) {
+    if (err) console.log(err);
     // get mcafeetweetssince lastCotCheckId
     getMcafeeTweetsSince(val)
     .then(tweets => {
-      console.log(val)
       // update lastCotTweetId in redis
       if (tweets.length > 0) {
         redisClient.set('lastCotCheckId', tweets[0].id_str);
@@ -145,7 +158,7 @@ const checkForCotw = new CronJob('0 * * * * *', function() {
               .then(symbol => Coin.findOne({Symbol: symbol}))
               // use symbol to get coin proximity info and insert
               .then(async coin => {
-                const cp = await getCurrencyProximity(coin.CoinName, coin.Symbol, 'BTC', 'CCCAGG', (new Date(tweet.created_at).getTime() / 1000));
+                const cp = await getCurrencyProximity(coin.CoinName, coin.Symbol, 'BTC', 'CCCAGG', Math.round((new Date(tweet.created_at).getTime() / 1000)));
                 const newCp = new CurrencyProximity(cp);
                 newCp.save(err => {
                   console.log('New currencyProximity: ' + newCp);
@@ -268,11 +281,11 @@ const checkForCotw = new CronJob('0 * * * * *', function() {
         }
       })
     })
+    .catch(e => console.log(e));
   })
 
   
 // TODO:
-  //FIX before price selection to use closest to original number 
   // clean up and seperate the code
 }, null, true, 'America/Los_Angeles');
 
@@ -281,6 +294,5 @@ let afterJob;
 
   // cotw happen monday mornings
   // need to add a table view for all cotw/d
-  // add support for ICO of the week
 
 app.listen(process.env.PORT || 8080, () => console.log(`running on ${process.env.PORT || 8080}`));
