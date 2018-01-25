@@ -33,7 +33,7 @@ function getCurrencyMinuteHistory (symbol, pairSym, exchange, tweetTime) {
         method: 'GET',
         uri: 'https://min-api.cryptocompare.com/data/histominute',
         qs: {
-          limit: 2
+          limit: 1
         },
         json: true
       };
@@ -50,9 +50,9 @@ async function getCurrencyProximity (name, symbol, pairSym, exchange, tweetTime)
         name,
         symbol,
         before: {
-            // FIX TO GRAB CORRECT TIME AND PRICE NOT ALWAYS [1]
-           epoch: before.Data[1].time,
-           price: before.Data[1].high 
+            // gets last Data index
+            epoch: before.Data[before.Data.length - 1].time,
+            price: before.Data[before.Data.length - 1].high 
         },
         pairing: pairSym
     }
