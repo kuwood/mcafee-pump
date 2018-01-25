@@ -150,7 +150,7 @@ class App extends Component {
             <Grid.Column width={8}>
               <CoinStats
                 before={cot.currency_proximity.before.price}
-                after={cot.currency_proximity.after.price}
+                after={cot.currency_proximity.after && cot.currency_proximity.after.price}
                 current={cot.currency_proximity.current}
               />
             </Grid.Column>
