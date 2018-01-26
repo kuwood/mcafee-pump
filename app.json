@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "dokku": {
+      "predeploy": "cd client && npm i && npm run build",
+      "postdeploy": "echo deploy complete"
+    }
+  }
+}
