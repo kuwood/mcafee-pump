@@ -1,8 +1,8 @@
 {
   "scripts": {
     "dokku": {
-      "predeploy": "pwd && ls",
-      "postdeploy": "cd client && pwd && npm i && npm run build"
+      "predeploy": "cd client && pwd && npm i && npm run build",
+      "postdeploy": ""
     }
   }
 }
