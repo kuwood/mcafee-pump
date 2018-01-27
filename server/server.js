@@ -27,7 +27,7 @@ mongoose.Promise = global.Promise;
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-const redisClient = redis.createClient();
+const redisClient = redis.createClient({host: process.env.REDIS_IP});
 
 redisClient.on('error', function (err) {
   console.log('Error ' + err)
