@@ -18,7 +18,7 @@ const getCurrencyProximity = require('./services/getCurrencyProximity');
 const CurrencyProximity = require('./models/CurrencyProximity');
 const Tweet = require('./models/Tweet');
 const Coin = require('./models/Coin');
-const mongoUrl = process.env.NODE_ENV === 'prod' ? process.env.MONGO_PROD : process.env.MONGO_MCPUMP;
+const mongoUrl = process.env.NODE_ENV === 'production' ? process.env.MONGO_MCPUMP : MONGO_DEV;
 
 mongoose.connect(mongoUrl, {
   useMongoClient: true
@@ -31,6 +31,7 @@ const redisClient = redis.createClient({host: process.env.REDIS_IP});
 
 redisClient.on('error', function (err) {
   console.log('Error ' + err)
+  console.log('mongo url:', mongoUrl)
 })
 
 redisClient.set('redisTest', 'Redis Test Success');
