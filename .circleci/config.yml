@@ -45,7 +45,7 @@ jobs:
               - "33:92:c5:d9:98:50:e2:ea:3e:49:3e:af:c2:ac:87:8f"
         - run:
             name: Strict Host Checking
-            command: mkdir ~/.ssh/ && echo -e "Host $DOKKU_IP\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+            command: echo -e "Host $DOKKU_IP\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
         - run:
             name: Dokku
             command: |
