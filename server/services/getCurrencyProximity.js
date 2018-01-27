@@ -37,7 +37,7 @@ function getCurrencyMinuteHistory (symbol, pairSym, exchange, tweetTime) {
         },
         json: true
       };
-    options.qs.toTs = tweetTime;
+    options.qs.toTs = '' + tweetTime;
     options.qs.fsym = symbol;
     options.qs.tsym = pairSym;
     options.qs.e = exchange;

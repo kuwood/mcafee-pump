@@ -8,7 +8,8 @@ const options = {
     user_id: '961445378',
     exclude_replies: 'true',
     include_rts: 'false',
-    tweet_mode: 'extended'
+    tweet_mode: 'extended',
+    count: '200'
   },
   headers: {
     Authorization: `Bearer ${process.env.TWITTER_APP_ONLY_TOKEN}`
