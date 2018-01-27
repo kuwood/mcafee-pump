@@ -18,7 +18,7 @@ const getCurrencyProximity = require('./services/getCurrencyProximity');
 const CurrencyProximity = require('./models/CurrencyProximity');
 const Tweet = require('./models/Tweet');
 const Coin = require('./models/Coin');
-const mongoUrl = process.env.NODE_ENV === 'production' ? process.env.MONGO_MCPUMP : MONGO_DEV;
+const mongoUrl = process.env.NODE_ENV === 'production' ? process.env.MONGO_MCPUMP : process.env.MONGO_DEV;
 
 mongoose.connect(mongoUrl, {
   useMongoClient: true

@@ -25,11 +25,14 @@ class CoinStats extends Component {
   }
 
   calcPercentageChange(before, after) {
-    return ((after - before) / before) * 100 
+    const beforeFloat = +parseFloat(before)
+    const afterFloat = +parseFloat(after)
+    const percentageChange = (((afterFloat - beforeFloat) / beforeFloat) * 100).toFixed(2) 
+    return percentageChange
   }
 
   render() {
-    return (
+    return ( this.props.current ? 
       <div style={{width: '290px', padding: '0 16px', margin: '0 auto'}}>
         <Statistic.Group size='tiny' widths={3}>
           <Statistic >
@@ -37,17 +40,18 @@ class CoinStats extends Component {
             <Statistic.Label>one hour before</Statistic.Label>
           </Statistic>
           <Statistic color={this.state.afterColor}>
-            <Statistic.Value>({this.calcPercentageChange(+parseFloat(this.props.before), +parseFloat(this.props.after)).toFixed(2)}%)</Statistic.Value>
+            <Statistic.Value>({this.calcPercentageChange(this.props.before, this.props.after)}%)</Statistic.Value>
             <Statistic.Value>{this.props.after}</Statistic.Value>
             <Statistic.Label>one hour after</Statistic.Label>
           </Statistic>
           <Statistic color={this.state.currentColor}>
-            <Statistic.Value>({this.calcPercentageChange(+parseFloat(this.props.before), +parseFloat(this.props.current)).toFixed(2)}%)</Statistic.Value>
+            <Statistic.Value>({this.calcPercentageChange(this.props.before, this.props.current)}%)</Statistic.Value>
             <Statistic.Value>{this.props.current}</Statistic.Value>
             <Statistic.Label>current price</Statistic.Label>
           </Statistic>
         </Statistic.Group>
-      </div>
+      </div> :
+      'Loading Coin Stats...'
     )
   }  
 };

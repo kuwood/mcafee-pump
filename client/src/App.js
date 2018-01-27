@@ -78,8 +78,9 @@ class App extends Component {
         }
         this.setState({cot: newcot});
       })
+      .then(() => this.currentPriceTick())
       .catch(e => console.log(e));
-      this.currentPriceTick();
+    
     const priceInterval = setInterval(this.currentPriceTick, 5000);
     this.setState({priceInterval});
   }
