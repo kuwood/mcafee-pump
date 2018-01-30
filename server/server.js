@@ -33,14 +33,14 @@ redisClient.on('error', function (err) {
   console.log('Error ' + err)
 })
 
-redisClient.set('redisTest', 'Redis Test Success');
-redisClient.get('redisTest', function(err, data){ err ? console.log(err) : console.log(data)});
-
 const app = express();
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
+app.use(logger('common', {
+  skip: function (req, res) {
+      return res.statusCode < 400
+  }}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -55,8 +55,6 @@ app.get('/', function (req, res) {
 });
 
 app.get('/cot', function (req, res) {
-  console.log('hi')
-  // res.status(200).json({hi: 'hi'})
   redisClient.get('cot', function(err, data) {
     if (err) console.log(err)
     res.json(data);
